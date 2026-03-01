@@ -9,6 +9,7 @@ const CLOSE_SIZE = 44
 const BAR_COLLAPSED = 44 // icon bar width when collapsed (padding + trigger)
 const DEFAULT_INPUT_WIDTH = 220
 const GAP = 8
+const FADE_DUR = 0.1 // opacity fade duration for morph sequencing
 
 export const GoeySearch = ({
   tabs = [],
@@ -72,11 +73,14 @@ export const GoeySearch = ({
     }
   }, [lockedWidth, tabs, hasTabs])
 
-  // Calculate input width to keep total width constant
-  // Only applies when we have tabs (width is locked)
+  // Calculate dimensions for morph
+  const tabsWidth = hasTabs && lockedWidth ? lockedWidth - BAR_COLLAPSED - GAP : undefined
   const inputExpandedWidth = hasTabs && lockedWidth
     ? lockedWidth - BAR_COLLAPSED - GAP - CLOSE_SIZE
     : DEFAULT_INPUT_WIDTH
+
+  // Approximate time for the width morph to perceptually settle (for sequencing the final fade)
+  const morphSettleTime = useSpring ? 0.35 : 0.25
 
   const handleExpand = useCallback(() => {
     setExpanded(true)
@@ -133,8 +137,11 @@ export const GoeySearch = ({
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fastFade = { duration: 0.12 }
-  const instantFade = { duration: 0.06 }
+  // Morph transition for the width animations (input + right-slot)
+  // Delayed by FADE_DUR so opacity fades first, then width morphs
+  const morphTransition = hasTabs
+    ? { ...transition, delay: FADE_DUR }
+    : transition
 
   return (
     <LayoutGroup id={instanceId}>
@@ -167,11 +174,21 @@ export const GoeySearch = ({
                 key="input-area"
                 className="goey-search-input-wrapper"
                 initial={{ width: 0, opacity: 0 }}
-                animate={{ width: inputExpandedWidth, opacity: 1, transition }}
+                animate={{
+                  width: inputExpandedWidth,
+                  opacity: 1,
+                  transition: {
+                    ...morphTransition,
+                    opacity: { duration: 0.08, delay: hasTabs ? FADE_DUR : 0 },
+                  },
+                }}
                 exit={{
                   width: 0,
                   opacity: 0,
-                  transition: { ...transition, opacity: { duration: 0.08 } },
+                  transition: {
+                    ...morphTransition,
+                    opacity: { duration: 0.08 },
+                  },
                 }}
               >
                 <input
@@ -189,69 +206,103 @@ export const GoeySearch = ({
           </AnimatePresence>
         </div>
 
-        {/* Right side: tabs fade to close button */}
-        {(hasTabs || expanded) && (
-          <div className="goey-search-right-slot">
-            <AnimatePresence initial={false}>
-              {expanded ? (
-                <motion.button
-                  key="close-content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: fastFade }}
-                  exit={{ opacity: 0, transition: instantFade }}
+        {/* Right side: morphing pill (with tabs) */}
+        {hasTabs && (
+          <motion.div
+            className="goey-search-right-slot"
+            initial={false}
+            animate={{ width: expanded ? CLOSE_SIZE : (tabsWidth ?? 'auto') }}
+            transition={tabsWidth != null ? morphTransition : { duration: 0 }}
+          >
+            {/* Tabs — always rendered, opacity controlled */}
+            <motion.div
+              className={`goey-search-tabs-content ${classNames.tabList ?? ''}`.trim()}
+              role="tablist"
+              initial={false}
+              animate={{ opacity: expanded ? 0 : 1 }}
+              transition={{
+                duration: FADE_DUR,
+                delay: expanded ? 0 : FADE_DUR + morphSettleTime,
+              }}
+              style={{ pointerEvents: expanded ? 'none' : 'auto' }}
+            >
+              {tabs.map((tab) => {
+                const isActive = tab.value === currentActiveTab
+                return (
+                  <button
+                    key={tab.value}
+                    role="tab"
+                    aria-selected={isActive}
+                    className={[
+                      'goey-search-tab',
+                      classNames.tab ?? '',
+                      isActive ? (classNames.activeTab ?? '') : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    onClick={() => handleTabClick(tab.value)}
+                    type="button"
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="goey-search-active-indicator"
+                        className="goey-search-tab-indicator"
+                        transition={transition}
+                      />
+                    )}
+                    <span className="goey-search-tab-content">
+                      {tab.icon && (
+                        <span className="goey-search-tab-icon">{tab.icon}</span>
+                      )}
+                      {tab.label}
+                    </span>
+                  </button>
+                )
+              })}
+            </motion.div>
+
+            {/* Close button — always rendered, opacity controlled */}
+            <motion.button
+              className={`goey-search-close-content ${classNames.closeButton ?? ''}`.trim()}
+              initial={false}
+              animate={{ opacity: expanded ? 1 : 0 }}
+              transition={{
+                duration: FADE_DUR,
+                delay: expanded ? FADE_DUR + morphSettleTime : 0,
+              }}
+              onClick={handleCollapse}
+              aria-label="Close search"
+              type="button"
+              style={{ pointerEvents: expanded ? 'auto' : 'none' }}
+            >
+              <CloseIcon size={18} />
+            </motion.button>
+          </motion.div>
+        )}
+
+        {/* Right side: simple close button (no-tabs case) */}
+        {!hasTabs && (
+          <AnimatePresence initial={false}>
+            {expanded && (
+              <motion.div
+                key="close-slot"
+                className="goey-search-right-slot"
+                style={{ width: CLOSE_SIZE }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.15 } }}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              >
+                <button
                   className={`goey-search-close-content ${classNames.closeButton ?? ''}`.trim()}
                   onClick={handleCollapse}
                   aria-label="Close search"
                   type="button"
                 >
                   <CloseIcon size={18} />
-                </motion.button>
-              ) : hasTabs ? (
-                <motion.div
-                  key="tabs-content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: fastFade }}
-                  exit={{ opacity: 0, transition: instantFade }}
-                  className={`goey-search-tabs-content ${classNames.tabList ?? ''}`.trim()}
-                  role="tablist"
-                >
-                  {tabs.map((tab) => {
-                    const isActive = tab.value === currentActiveTab
-                    return (
-                      <button
-                        key={tab.value}
-                        role="tab"
-                        aria-selected={isActive}
-                        className={[
-                          'goey-search-tab',
-                          classNames.tab ?? '',
-                          isActive ? (classNames.activeTab ?? '') : '',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                        onClick={() => handleTabClick(tab.value)}
-                        type="button"
-                      >
-                        {isActive && (
-                          <motion.span
-                            layoutId="goey-search-active-indicator"
-                            className="goey-search-tab-indicator"
-                            transition={transition}
-                          />
-                        )}
-                        <span className="goey-search-tab-content">
-                          {tab.icon && (
-                            <span className="goey-search-tab-icon">{tab.icon}</span>
-                          )}
-                          {tab.label}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-          </div>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
       </div>
     </LayoutGroup>
