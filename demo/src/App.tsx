@@ -417,12 +417,10 @@ function App() {
           <div className="doc-section-content">
             <p>
               Each tab requires a <span className="inline-code">label</span> and{' '}
-              <span className="inline-code">value</span>. Optionally include an{' '}
-              <span className="inline-code">icon</span> (any ReactNode).
+              <span className="inline-code">value</span>.
             </p>
             <pre><code>{`interface GoeySearchTab {
   label: string
-  icon?: ReactNode
   value: string
 }`}</code></pre>
             <div className="table-scroll">
@@ -431,8 +429,7 @@ function App() {
                 <tr><th>Property</th><th>Type</th><th>Required</th><th>Description</th></tr>
               </thead>
               <tbody>
-                <tr><td>label</td><td>string</td><td>Yes</td><td>Display label for the tab</td></tr>
-                <tr><td>icon</td><td>ReactNode</td><td>No</td><td>Icon rendered before the label</td></tr>
+                <tr><td>label</td><td>string</td><td>Yes</td><td>Display label for the tab (emojis welcome)</td></tr>
                 <tr><td>value</td><td>string</td><td>Yes</td><td>Unique value for identification and callbacks</td></tr>
               </tbody>
             </table>
@@ -528,9 +525,9 @@ import { animationPresets } from 'goey-search'`}</code></pre>
             <pre><code>{`// With tabs
 <GoeySearch
   tabs={[
-    { label: 'Popular', value: 'popular', icon: '🔥' },
-    { label: 'Favorites', value: 'favorites', icon: '❤️' },
-    { label: 'Recent', value: 'recent', icon: '🕐' },
+    { label: '🔥 Popular', value: 'popular' },
+    { label: '❤️ Favorites', value: 'favorites' },
+    { label: '🕐 Recent', value: 'recent' },
   ]}
   onTabChange={(value) => console.log(value)}
 />

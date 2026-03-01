@@ -57,9 +57,8 @@
 }
 
 /* ============================================
-   Right slot — grid stacking so the morphing
-   background, tabs content, and close content
-   all occupy the same cell.
+   Right slot — stacks tabs and close button
+   in the same space via grid.
    ============================================ */
 .goey-search-right-slot {
   display: grid;
@@ -74,29 +73,7 @@
 }
 
 /* ============================================
-   Morphing background — shared layoutId morphs
-   from the wide tabs pill shape to the small
-   close button circle and back.
-   ============================================ */
-.goey-search-tabs-bg {
-  width: 100%;
-  height: 44px;
-  border-radius: 999px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.goey-search-close-bubble {
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
-  justify-self: end;
-}
-
-/* ============================================
-   Tabs content — sits on top of the morphing bg
+   Tabs content — pill background, holds tabs
    ============================================ */
 .goey-search-tabs-content {
   display: flex;
@@ -104,8 +81,9 @@
   gap: 2px;
   height: 44px;
   padding: 4px;
-  position: relative;
-  z-index: 1;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .goey-search-tab {
@@ -169,8 +147,7 @@
 }
 
 /* ============================================
-   Close button content — sits on top of the
-   morphing bg, aligned to the right
+   Close button — own pill background, aligned right
    ============================================ */
 .goey-search-close-content {
   display: flex;
@@ -179,30 +156,23 @@
   width: 44px;
   height: 44px;
   border: none;
-  background: transparent;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
   color: #374151;
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: 999px;
   outline: none;
   -webkit-tap-highlight-color: transparent;
-  position: relative;
-  z-index: 1;
   justify-self: end;
 }
 
 .goey-search-close-content:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: #f9f9f9;
 }
 
 .goey-search-close-content:focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
-}
-
-/* When no morphing bg exists (no-tabs variant), give close button its own bg */
-.goey-search-right-slot:not(:has(.goey-search-tabs-bg, .goey-search-close-bubble)) .goey-search-close-content {
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* ============================================

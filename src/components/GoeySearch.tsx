@@ -189,20 +189,9 @@ export const GoeySearch = ({
           </AnimatePresence>
         </div>
 
-        {/* Right side: tabs morph into close button via shared layoutId */}
+        {/* Right side: tabs fade to close button */}
         {(hasTabs || expanded) && (
           <div className="goey-search-right-slot">
-            {/* Morphing background shape — shared layoutId creates the morph */}
-            {hasTabs && (
-              <motion.div
-                layoutId="goey-search-right-bg"
-                className={expanded ? 'goey-search-close-bubble' : 'goey-search-tabs-bg'}
-                transition={transition}
-                style={{ borderRadius: 999 }}
-              />
-            )}
-
-            {/* Content layer — fades in/out on top of the morphing bg */}
             <AnimatePresence initial={false}>
               {expanded ? (
                 <motion.button
