@@ -168,10 +168,15 @@
   outline: none;
   -webkit-tap-highlight-color: transparent;
   justify-self: end;
+  /* Inner circle matches trigger: 36x36 hover within 44x44 hit area */
+  background-clip: content-box;
+  padding: 4px;
+  transition: background 0.15s ease;
 }
 
 .goey-search-close-content:hover {
   background: rgba(0, 0, 0, 0.04);
+  background-clip: content-box;
 }
 
 .goey-search-close-content:focus-visible {
