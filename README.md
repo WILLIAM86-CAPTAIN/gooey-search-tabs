@@ -1,5 +1,9 @@
 # gooey-search-tabs
 
+[![gooey-search-tabs](https://gooey-search-tabs.vercel.app/og-image.png)](https://gooey-search-tabs.vercel.app)
+
+**[Live Demo & Docs](https://gooey-search-tabs.vercel.app)**
+
 A morphing search bar component with animated tab navigation for React. Built with Framer Motion.
 
 ## Features
