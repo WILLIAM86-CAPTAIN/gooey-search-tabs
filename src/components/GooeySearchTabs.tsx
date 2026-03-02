@@ -5,6 +5,22 @@ import { animationPresets } from '../presets'
 import { SearchIcon } from './SearchIcon'
 import { CloseIcon } from './CloseIcon'
 
+/** Parse a CSS color string (hex or rgb/rgba) into normalised [r,g,b] (0–1). */
+function parseCssColor(raw: string): [number, number, number] | null {
+  if (raw.startsWith('#')) {
+    let hex = raw.slice(1)
+    if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
+    return [
+      parseInt(hex.slice(0, 2), 16) / 255,
+      parseInt(hex.slice(2, 4), 16) / 255,
+      parseInt(hex.slice(4, 6), 16) / 255,
+    ]
+  }
+  const m = raw.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/)
+  if (m) return [Number(m[1]) / 255, Number(m[2]) / 255, Number(m[3]) / 255]
+  return null
+}
+
 const CLOSE_SIZE = 44
 const BAR_COLLAPSED = 44 // icon bar width when collapsed (padding + trigger)
 const DEFAULT_INPUT_WIDTH = 220
@@ -28,6 +44,8 @@ export const GooeySearchTabs = ({
   preset,
   gooey = false,
   gooeyIntensity = 0.5,
+  theme = 'light',
+  searchPosition = 'left',
   className,
   style,
   classNames = {},
@@ -63,12 +81,33 @@ export const GooeySearchTabs = ({
   // Bridge height: linear scale gives more visible hourglass curves at medium intensity
   const bridgeHeight = Math.max(4, Math.round(gooeyIntensity * 44))
 
+  // Gooey filter color: compute synchronously from style override or theme default.
+  // SVG feColorMatrix can't use CSS variables, so we derive RGB values here.
+  const gooeyRgb: [number, number, number] = (() => {
+    const styleBg = (style as Record<string, string> | undefined)?.['--gst-bg']
+    if (typeof styleBg === 'string') {
+      const parsed = parseCssColor(styleBg)
+      if (parsed) return parsed
+    }
+    return theme === 'dark' ? [30 / 255, 30 / 255, 30 / 255] : [1, 1, 1]
+  })()
+
+  // Gooey drop-shadow: heavier shadow for dark backgrounds
+  const bgBrightness = (gooeyRgb[0] + gooeyRgb[1] + gooeyRgb[2]) / 3
+  const gooeyDropShadow = bgBrightness < 0.5
+    ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 1px 2px rgba(0,0,0,0.2))'
+    : 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
+
   // Bridge overlap: at high intensity, the bridge extends behind the pills via
   // negative margins. This fills the gap left by the pills' border-radius at the
   // top/bottom corners, eliminating concave notches at the junction.
-  // Flex contribution stays constant: (GAP + 2*overlap) - 2*overlap = GAP.
-  const bridgeOverlap = Math.round(gooeyIntensity * 15)
-  const bridgeWidth = GAP + bridgeOverlap * 2
+  // Asymmetric: less overlap behind the small search bar, more behind the larger
+  // tabs pill, so the gooey junction doesn't eat into the circle.
+  // Flex contribution stays constant: (width) - barOverlap - tabsOverlap = GAP.
+  const totalOverlap = Math.round(gooeyIntensity * 15) * 2
+  const barSideOverlap = Math.max(2, Math.round(totalOverlap * 0.2))
+  const tabsSideOverlap = totalOverlap - barSideOverlap
+  const bridgeWidth = GAP + totalOverlap
 
   // Reset locked width when tabs change so it re-measures
   const tabsKey = tabs.map(t => `${t.label}|${t.value}`).join(',')
@@ -269,13 +308,13 @@ export const GooeySearchTabs = ({
       {gooey && (
         <svg style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
           <defs>
-            <filter id={filterId} x="-10%" y="-60%" width="120%" height="220%">
+            <filter id={filterId} x="-10%" y="-60%" width="120%" height="220%" colorInterpolationFilters="sRGB">
               {/* Blur smooths the junction where bridge meets pill */}
               {/* Blur scales with intensity: thicker bridge → curvier junctions.
                   Bridge overlap fills corners so higher blur doesn't create notches. */}
               <feGaussianBlur in="SourceGraphic" stdDeviation={`${2 + gooeyIntensity * 8} ${2 + gooeyIntensity * 16}`} result="blur" />
-              {/* Force pure white + binary threshold → crisp organic outline */}
-              <feColorMatrix in="blur" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 100 -50" result="goo" />
+              {/* Force solid color + binary threshold → crisp organic outline */}
+              <feColorMatrix in="blur" type="matrix" values={`0 0 0 0 ${gooeyRgb[0]}  0 0 0 0 ${gooeyRgb[1]}  0 0 0 0 ${gooeyRgb[2]}  0 0 0 100 -50`} result="goo" />
               {/* Organic goo behind, original content on top */}
               <feMerge>
                 <feMergeNode in="goo" />
@@ -291,12 +330,14 @@ export const GooeySearchTabs = ({
         style={{
           ...style,
           ...(hasTabs && lockedWidth ? { width: lockedWidth } : undefined),
-          ...(gooey ? { gap: 0, filter: `url(#${filterId}) drop-shadow(0 2px 4px rgba(0,0,0,0.08)) drop-shadow(0 1px 2px rgba(0,0,0,0.04))` } : undefined),
+          ...(gooey ? { gap: 0, filter: `url(#${filterId}) ${gooeyDropShadow}` } : undefined),
+          ...(searchPosition === 'right' ? { flexDirection: 'row-reverse' } : undefined),
         }}
         role="search"
         aria-label="Search"
         data-expanded={expanded}
         data-gooey={gooey || undefined}
+        data-theme={theme}
       >
         {/* Left side: bar grows as input springs in, pushing right-slot.
             The input spring creates the bounce — bar overshoots on expand,
@@ -344,8 +385,8 @@ export const GooeySearchTabs = ({
             style={{
               width: bridgeWidth,
               height: bridgeHeight,
-              marginLeft: -bridgeOverlap,
-              marginRight: -bridgeOverlap,
+              marginLeft: searchPosition === 'right' ? -tabsSideOverlap : -barSideOverlap,
+              marginRight: searchPosition === 'right' ? -barSideOverlap : -tabsSideOverlap,
             }}
           />
         )}

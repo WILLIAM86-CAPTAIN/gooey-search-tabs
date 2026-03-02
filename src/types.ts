@@ -43,6 +43,10 @@ export interface GooeySearchTabsProps {
   gooey?: boolean
   /** Gooey connector thickness (0–1, default 0.5) */
   gooeyIntensity?: number
+  /** Color theme: 'light' (default) or 'dark' */
+  theme?: 'light' | 'dark'
+  /** Position of the search icon: 'left' (default) or 'right' */
+  searchPosition?: 'left' | 'right'
   /** Additional CSS class on the outer container */
   className?: string
   /** Additional inline styles on the outer container */

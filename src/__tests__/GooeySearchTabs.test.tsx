@@ -159,6 +159,30 @@ describe('GooeySearchTabs', () => {
     expect(screen.getByRole('tablist')).toBeInTheDocument()
   })
 
+  // --- Theme ---
+  it('defaults to data-theme="light"', () => {
+    render(<GooeySearchTabs tabs={sampleTabs} />)
+    expect(screen.getByRole('search').getAttribute('data-theme')).toBe('light')
+  })
+
+  it('applies data-theme="dark" when theme="dark"', () => {
+    render(<GooeySearchTabs tabs={sampleTabs} theme="dark" />)
+    expect(screen.getByRole('search').getAttribute('data-theme')).toBe('dark')
+  })
+
+  // --- Search Position ---
+  it('defaults searchPosition to left (no row-reverse)', () => {
+    render(<GooeySearchTabs tabs={sampleTabs} />)
+    const wrapper = screen.getByRole('search')
+    expect(wrapper.style.flexDirection).not.toBe('row-reverse')
+  })
+
+  it('applies row-reverse when searchPosition="right"', () => {
+    render(<GooeySearchTabs tabs={sampleTabs} searchPosition="right" />)
+    const wrapper = screen.getByRole('search')
+    expect(wrapper.style.flexDirection).toBe('row-reverse')
+  })
+
   // --- Custom classNames ---
   it('applies custom className to wrapper', () => {
     render(<GooeySearchTabs tabs={sampleTabs} className="my-custom" />)

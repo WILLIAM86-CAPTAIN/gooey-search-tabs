@@ -908,6 +908,7 @@ code {
   flex-shrink: 0;
 }
 
+
 .playground-controls {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -925,6 +926,17 @@ code {
 
 .playground-row:last-child {
   margin-bottom: 0;
+}
+
+.playground-row--split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.playground-split-col {
+  display: flex;
+  flex-direction: column;
 }
 
 .playground-label {

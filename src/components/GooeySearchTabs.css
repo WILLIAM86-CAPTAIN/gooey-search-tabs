@@ -4,6 +4,17 @@
    any layout shift during morph transitions.
    ============================================ */
 .gooey-search-tabs-wrapper {
+  --gst-bg: #ffffff;
+  --gst-text: #374151;
+  --gst-input-text: #1f2937;
+  --gst-placeholder: #9ca3af;
+  --gst-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --gst-hover: rgba(0, 0, 0, 0.04);
+  --gst-focus-ring: #6366f1;
+  --gst-tab-indicator-bg: rgba(0, 0, 0, 0.06);
+  --gst-tab-active-text: #1f2937;
+  --gst-bridge-bg: #ffffff;
+
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -21,8 +32,8 @@
   align-items: center;
   height: 44px;
   border-radius: 999px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: var(--gst-bg);
+  box-shadow: var(--gst-shadow);
   padding: 0 4px;
   flex-shrink: 0;
 }
@@ -39,7 +50,7 @@
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: #374151;
+  color: var(--gst-text);
   cursor: pointer;
   flex-shrink: 0;
   outline: none;
@@ -48,11 +59,11 @@
 }
 
 .gooey-search-tabs-trigger:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--gst-hover);
 }
 
 .gooey-search-tabs-trigger:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--gst-focus-ring);
   outline-offset: 2px;
 }
 
@@ -70,8 +81,8 @@
   overflow: hidden;
   border-radius: 999px;
   height: 44px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: var(--gst-bg);
+  box-shadow: var(--gst-shadow);
 }
 
 .gooey-search-tabs-right-slot > * {
@@ -100,7 +111,7 @@
   border-radius: 999px;
   border: none;
   background: transparent;
-  color: #374151;
+  color: var(--gst-text);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -111,11 +122,11 @@
 }
 
 .gooey-search-tabs-tab:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--gst-hover);
 }
 
 .gooey-search-tabs-tab:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--gst-focus-ring);
   outline-offset: -2px;
 }
 
@@ -127,7 +138,7 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: #fee2e2;
+  background: var(--gst-tab-indicator-bg);
   z-index: 0;
 }
 
@@ -140,7 +151,7 @@
 }
 
 .gooey-search-tabs-tab[aria-selected="true"] {
-  color: #dc2626;
+  color: var(--gst-tab-active-text);
 }
 
 .gooey-search-tabs-tab-icon {
@@ -162,7 +173,7 @@
   height: 44px;
   border: none;
   background: transparent;
-  color: #374151;
+  color: var(--gst-text);
   cursor: pointer;
   border-radius: 999px;
   outline: none;
@@ -175,12 +186,12 @@
 }
 
 .gooey-search-tabs-close-content:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--gst-hover);
   background-clip: content-box;
 }
 
 .gooey-search-tabs-close-content:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--gst-focus-ring);
   outline-offset: 2px;
 }
 
@@ -199,13 +210,13 @@
   background: transparent;
   font-size: 14px;
   font-family: inherit;
-  color: #1f2937;
+  color: var(--gst-input-text);
   outline: none;
   padding: 8px 0 8px 12px;
 }
 
 .gooey-search-tabs-input::placeholder {
-  color: #9ca3af;
+  color: var(--gst-placeholder);
 }
 
 /* ============================================
@@ -220,11 +231,27 @@
 }
 
 /* ============================================
-   Bridge — solid white connector between pills.
+   Bridge — solid connector between pills.
    Height controlled by gooeyIntensity prop.
    ============================================ */
 .gooey-search-tabs-bridge {
-  background: #ffffff;
+  background: var(--gst-bridge-bg);
   align-self: center;
   flex-shrink: 0;
+}
+
+/* ============================================
+   Dark mode overrides
+   ============================================ */
+.gooey-search-tabs-wrapper[data-theme="dark"] {
+  --gst-bg: #1e1e1e;
+  --gst-text: #d1d5db;
+  --gst-input-text: #e5e7eb;
+  --gst-placeholder: #6b7280;
+  --gst-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --gst-hover: rgba(255, 255, 255, 0.08);
+  --gst-focus-ring: #818cf8;
+  --gst-tab-indicator-bg: rgba(255, 255, 255, 0.1);
+  --gst-tab-active-text: #f3f4f6;
+  --gst-bridge-bg: #1e1e1e;
 }

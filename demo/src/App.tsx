@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { GooeySearchTabs, animationPresets } from 'gooey-search-tabs'
 import type { AnimationPresetName } from 'gooey-search-tabs'
+import { GooeyToaster, gooeyToast } from 'goey-toast'
 import { Analytics } from '@vercel/analytics/react'
+import 'goey-toast/styles.css'
 import 'gooey-search-tabs/styles.css'
 import './App.css'
 
@@ -99,6 +101,8 @@ function App() {
   const [pgSpring, setPgSpring] = useState(true)
   const [pgBounce, setPgBounce] = useState(0.4)
   const [pgPlaceholder, setPgPlaceholder] = useState('Search...')
+  const [pgTheme, setPgTheme] = useState<'light' | 'dark'>('light')
+  const [pgSearchPosition, setPgSearchPosition] = useState<'left' | 'right'>('left')
   const [pgGooey, setPgGooey] = useState(false)
   const [pgGooeyIntensity, setPgGooeyIntensity] = useState(0.5)
   const codeCopy = useCopy()
@@ -129,6 +133,21 @@ function App() {
     window.scrollTo(0, 0)
   }, [page])
 
+  // Promo toast for gooey-toast
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      gooeyToast.info('Like this? Check out gooey-toast', {
+        description: 'Morphing toast notifications for React — with the same gooey animations.',
+        action: {
+          label: 'View Library',
+          onClick: () => window.open('https://goey-toast.vercel.app', '_blank'),
+        },
+        timing: { displayDuration: 60000 },
+      })
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [])
+
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false)
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -142,12 +161,15 @@ function App() {
   const springCode = !pgPreset && !pgSpring ? `\n      spring={false}` : ''
   const bounceCode = !pgPreset && pgSpring && pgBounce !== 0.1 ? `\n      bounce={${pgBounce}}` : ''
   const placeholderCode = pgPlaceholder ? `\n      placeholder="${pgPlaceholder}"` : ''
+  const themeCode = pgTheme === 'dark' ? `\n      theme="dark"` : ''
+  const searchPositionCode = pgSearchPosition === 'right' ? `\n      searchPosition="right"` : ''
   const gooeyCode = pgGooey ? `\n      gooey${pgGooeyIntensity !== 0.5 ? `\n      gooeyIntensity={${pgGooeyIntensity}}` : ''}` : ''
-  const generatedCode = `<GooeySearchTabs${tabsCode}${presetCode}${springCode}${bounceCode}${placeholderCode}${gooeyCode}\n    />`
+  const generatedCode = `<GooeySearchTabs${tabsCode}${presetCode}${springCode}${bounceCode}${placeholderCode}${themeCode}${searchPositionCode}${gooeyCode}\n    />`
 
   return (
     <>
       <Analytics />
+      <GooeyToaster position="top-right" />
 
       {/* Header */}
       <header className={`site-header${!heroVisible && page === 'home' ? ' header--hero-hidden' : ''}`}>
@@ -207,6 +229,23 @@ function App() {
 
           <div className="changelog-entry">
             <div className="changelog-version">
+              <span className="changelog-tag">v0.2.0</span>
+              <span className="changelog-date">Mar 1, 2026</span>
+            </div>
+            <div className="changelog-body">
+              <h4>Dark Mode, Search Position &amp; Color Customization</h4>
+              <ul>
+                <li>New <code>theme</code> prop: switch between <code>'light'</code> and <code>'dark'</code> modes</li>
+                <li>New <code>searchPosition</code> prop: place the search icon on the <code>'left'</code> or <code>'right'</code></li>
+                <li>All colors exposed as CSS custom properties (<code>--gst-*</code>) for easy customization</li>
+                <li>Dynamic gooey filter adapts to dark backgrounds (sRGB color-space fix)</li>
+                <li>Playground theme and search position toggles</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="changelog-entry">
+            <div className="changelog-version">
               <span className="changelog-tag">v0.1.0</span>
               <span className="changelog-date">Mar 1, 2026</span>
             </div>
@@ -234,7 +273,7 @@ function App() {
       {/* Hero */}
       <div className="hero">
         <div className="hero-badge">
-          <span /> v0.1.0
+          <span /> v0.2.0
         </div>
         <h1 ref={heroTitleRef} className={heroLanding ? 'hero-title--landing' : ''}>gooey-search-tabs <img src="/mascot.png" className={`hero-mascot${heroLanding ? ' hero-mascot--landing' : ''}`} alt="" /></h1>
         <p className="hero-description">
@@ -275,6 +314,8 @@ function App() {
               bounce={pgBounce}
               gooey={pgGooey}
               gooeyIntensity={pgGooeyIntensity}
+              theme={pgTheme}
+              searchPosition={pgSearchPosition}
             />
           </div>
 
@@ -315,6 +356,48 @@ function App() {
 
             {/* Right side controls */}
             <div className="playground-right-controls">
+              {/* Theme + Search Position (two-column row) */}
+              <div className="playground-row playground-row--split">
+                <div className="playground-split-col">
+                  <span className="playground-label">Theme</span>
+                  <div className="preset-buttons">
+                    <button
+                      className="preset-pill"
+                      data-active={pgTheme === 'light'}
+                      onClick={() => setPgTheme('light')}
+                    >
+                      light
+                    </button>
+                    <button
+                      className="preset-pill"
+                      data-active={pgTheme === 'dark'}
+                      onClick={() => setPgTheme('dark')}
+                    >
+                      dark
+                    </button>
+                  </div>
+                </div>
+                <div className="playground-split-col">
+                  <span className="playground-label">Search Position</span>
+                  <div className="preset-buttons">
+                    <button
+                      className="preset-pill"
+                      data-active={pgSearchPosition === 'left'}
+                      onClick={() => setPgSearchPosition('left')}
+                    >
+                      left
+                    </button>
+                    <button
+                      className="preset-pill"
+                      data-active={pgSearchPosition === 'right'}
+                      onClick={() => setPgSearchPosition('right')}
+                    >
+                      right
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Spring Toggle */}
               <div className="playground-row">
                 <div className="toggle-row">
@@ -500,6 +583,8 @@ function App() {
                 <tr><td>preset</td><td>AnimationPresetName</td><td>—</td><td>Named animation preset</td></tr>
                 <tr><td>gooey</td><td>boolean</td><td>false</td><td>Enable goey blob effect connecting bar and tabs</td></tr>
                 <tr><td>gooeyIntensity</td><td>number</td><td>0.5</td><td>Goey connector thickness (0–1)</td></tr>
+                <tr><td>theme</td><td>'light' | 'dark'</td><td>'light'</td><td>Color theme</td></tr>
+                <tr><td>searchPosition</td><td>'left' | 'right'</td><td>'left'</td><td>Position of the search icon</td></tr>
                 <tr><td>className</td><td>string</td><td>—</td><td>Class on the outer container</td></tr>
                 <tr><td>style</td><td>CSSProperties</td><td>—</td><td>Inline styles on the outer container</td></tr>
                 <tr><td>classNames</td><td>GooeySearchTabsClassNames</td><td>—</td><td>Custom class names for sub-elements</td></tr>
@@ -613,10 +698,65 @@ import { animationPresets } from 'gooey-search-tabs'`}</code></pre>
           </div>
         </div>
 
-        {/* 06 Tabs */}
+        {/* 06 Theming */}
         <div className="doc-section">
           <div className="doc-section-label">
             <div className="doc-number">06</div>
+            <h3>Theming</h3>
+          </div>
+          <div className="doc-section-content">
+            <p>
+              Switch to dark mode with the <span className="inline-code">theme</span> prop.
+            </p>
+            <pre><code>{`<GooeySearchTabs theme="dark" />`}</code></pre>
+            <p>
+              All colors use CSS custom properties (<span className="inline-code">--gst-*</span>) that
+              you can override via <span className="inline-code">style</span> or your own CSS:
+            </p>
+            <pre><code>{`// Override via style prop
+<GooeySearchTabs
+  style={{ '--gst-bg': '#1a1a2e', '--gst-text': '#e0e0e0' } as React.CSSProperties}
+/>
+
+// Or via CSS
+.my-search {
+  --gst-bg: #1a1a2e;
+  --gst-text: #e0e0e0;
+  --gst-tab-indicator-bg: #2d2d5e;
+  --gst-tab-active-text: #a78bfa;
+}`}</code></pre>
+            <p>
+              With <strong>Tailwind CSS</strong>, use arbitrary properties to override tokens directly:
+            </p>
+            <pre><code>{`<GooeySearchTabs
+  className="[--gst-bg:theme(colors.slate.900)] [--gst-text:theme(colors.slate.200)] [--gst-tab-indicator-bg:theme(colors.slate.700)]"
+/>`}</code></pre>
+            <div className="table-scroll">
+            <table className="prop-table">
+              <thead>
+                <tr><th>Token</th><th>Light</th><th>Dark</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>--gst-bg</td><td>#ffffff</td><td>#1e1e1e</td><td>Bar &amp; right-slot background</td></tr>
+                <tr><td>--gst-text</td><td>#374151</td><td>#d1d5db</td><td>Trigger, tab, close button text</td></tr>
+                <tr><td>--gst-input-text</td><td>#1f2937</td><td>#e5e7eb</td><td>Input text color</td></tr>
+                <tr><td>--gst-placeholder</td><td>#9ca3af</td><td>#6b7280</td><td>Input placeholder</td></tr>
+                <tr><td>--gst-shadow</td><td colSpan={2}>—</td><td>Bar/right-slot shadow</td></tr>
+                <tr><td>--gst-hover</td><td>rgba(0,0,0,0.04)</td><td>rgba(255,255,255,0.08)</td><td>Hover background</td></tr>
+                <tr><td>--gst-focus-ring</td><td>#6366f1</td><td>#818cf8</td><td>Focus-visible outline</td></tr>
+                <tr><td>--gst-tab-indicator-bg</td><td>rgba(0,0,0,0.06)</td><td>rgba(255,255,255,0.1)</td><td>Active tab indicator</td></tr>
+                <tr><td>--gst-tab-active-text</td><td>#1f2937</td><td>#f3f4f6</td><td>Active tab text</td></tr>
+                <tr><td>--gst-bridge-bg</td><td>#ffffff</td><td>#1e1e1e</td><td>Gooey bridge connector</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+
+        {/* 07 Tabs */}
+        <div className="doc-section">
+          <div className="doc-section-label">
+            <div className="doc-number">07</div>
             <h3>Tabs</h3>
           </div>
           <div className="doc-section-content">
@@ -638,10 +778,10 @@ import { animationPresets } from 'gooey-search-tabs'`}</code></pre>
           </div>
         </div>
 
-        {/* 07 Controlled Mode */}
+        {/* 08 Controlled Mode */}
         <div className="doc-section">
           <div className="doc-section-label">
-            <div className="doc-number">07</div>
+            <div className="doc-number">08</div>
             <h3>Controlled Mode</h3>
           </div>
           <div className="doc-section-content">
@@ -662,10 +802,10 @@ const [tab, setTab] = useState('all')
           </div>
         </div>
 
-        {/* 08 Keyboard Shortcuts */}
+        {/* 09 Keyboard Shortcuts */}
         <div className="doc-section">
           <div className="doc-section-label">
-            <div className="doc-number">08</div>
+            <div className="doc-number">09</div>
             <h3>Keyboard Shortcuts</h3>
           </div>
           <div className="doc-section-content">
@@ -683,10 +823,10 @@ const [tab, setTab] = useState('all')
           </div>
         </div>
 
-        {/* 09 Exports */}
+        {/* 10 Exports */}
         <div className="doc-section">
           <div className="doc-section-label">
-            <div className="doc-number">09</div>
+            <div className="doc-number">10</div>
             <h3>Exports</h3>
           </div>
           <div className="doc-section-content">
@@ -714,9 +854,9 @@ export type {
       {/* Footer */}
       <footer className="site-footer">
         <p>
-          Part of the{' '}
-          <a href="https://goey-toast.vercel.app" target="_blank" rel="noopener noreferrer">goey</a>{' '}
-          family
+          Also check out{' '}
+          <a href="https://goey-toast.vercel.app" target="_blank" rel="noopener noreferrer">gooey-toast</a>{' '}
+          — morphing toast notifications for React.
         </p>
       </footer>
     </>

@@ -16,6 +16,7 @@ A morphing search bar component with animated tab navigation for React. Built wi
 - Controlled and uncontrolled modes for value and active tab
 - Gooey blob effect connecting tabs and search bar with adjustable intensity
 - No-tabs variant for a simple expanding search bar
+- Dark mode via `theme` prop and CSS custom properties (`--gst-*`) for full color customization
 - CSS class overrides via `classNames` prop
 - Full accessibility: `role="search"`, `role="tablist"`, `aria-selected`, focus-visible outlines
 
@@ -93,6 +94,8 @@ Props for the `<GooeySearchTabs />` component.
 | `preset`          | `AnimationPresetName`         | —       | Named animation preset                   |
 | `gooey`           | `boolean`                     | `false` | Enable gooey blob effect connecting bar and tabs |
 | `gooeyIntensity`  | `number`                      | `0.5`   | Gooey connector thickness (0–1)          |
+| `theme`           | `'light' \| 'dark'`           | `'light'`| Color theme                              |
+| `searchPosition`  | `'left' \| 'right'`           | `'left'` | Position of the search icon              |
 | `className`       | `string`                      | —       | CSS class on the outer container         |
 | `style`           | `CSSProperties`               | —       | Inline styles on the outer container     |
 | `classNames`      | `GooeySearchTabsClassNames`   | —       | Custom class names for sub-elements      |
@@ -215,6 +218,45 @@ const [tab, setTab] = useState('all')
 />
 ```
 
+### Dark Mode
+
+```tsx
+<GooeySearchTabs theme="dark" />
+```
+
+### CSS Custom Properties
+
+All colors use CSS custom properties (`--gst-*`) that you can override:
+
+```tsx
+<GooeySearchTabs
+  style={{ '--gst-bg': '#1a1a2e', '--gst-text': '#e0e0e0' } as React.CSSProperties}
+/>
+```
+
+| Token | Light | Dark | Purpose |
+| ----- | ----- | ---- | ------- |
+| `--gst-bg` | `#ffffff` | `#1e1e1e` | Bar & right-slot background |
+| `--gst-text` | `#374151` | `#d1d5db` | Trigger, tab, close button text |
+| `--gst-input-text` | `#1f2937` | `#e5e7eb` | Input text color |
+| `--gst-placeholder` | `#9ca3af` | `#6b7280` | Input placeholder |
+| `--gst-shadow` | — | — | Bar/right-slot shadow |
+| `--gst-hover` | `rgba(0,0,0,0.04)` | `rgba(255,255,255,0.08)` | Hover background |
+| `--gst-focus-ring` | `#6366f1` | `#818cf8` | Focus-visible outline |
+| `--gst-tab-indicator-bg` | `rgba(0,0,0,0.06)` | `rgba(255,255,255,0.1)` | Active tab indicator |
+| `--gst-tab-active-text` | `#1f2937` | `#f3f4f6` | Active tab text |
+| `--gst-bridge-bg` | `#ffffff` | `#1e1e1e` | Gooey bridge connector |
+
+### Tailwind CSS
+
+Override tokens directly with Tailwind's arbitrary properties:
+
+```tsx
+<GooeySearchTabs
+  className="[--gst-bg:theme(colors.slate.900)] [--gst-text:theme(colors.slate.200)] [--gst-tab-indicator-bg:theme(colors.slate.700)]"
+/>
+```
+
 ### Start Expanded
 
 ```tsx
@@ -258,6 +300,10 @@ gooey-search-tabs works in all modern browsers that support:
 - CSS Grid and Flexbox
 - ResizeObserver
 - `framer-motion` (Chrome, Firefox, Safari, Edge)
+
+## See Also
+
+- **[gooey-toast](https://github.com/anl331/goey-toast)** — Morphing toast notifications for React with organic blob animations. [Live Demo](https://goey-toast.vercel.app)
 
 ## License
 
