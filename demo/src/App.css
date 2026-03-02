@@ -662,8 +662,8 @@ button:active {
 
 /* Prevent demo button styles from leaking into GoeySearch.
    :where() gives zero specificity so the component's own
-   class selectors (.goey-search-tab etc.) always win. */
-:where(.goey-search-wrapper) button {
+   class selectors (.gooey-search-tabs-tab etc.) always win. */
+:where(.gooey-search-tabs-wrapper) button {
   background: transparent;
   padding: 0;
   border: none;
@@ -675,14 +675,14 @@ button:active {
   transform: none;
   box-shadow: none;
 }
-:where(.goey-search-wrapper) button:hover,
-:where(.goey-search-wrapper) button:active {
+:where(.gooey-search-tabs-wrapper) button:hover,
+:where(.gooey-search-tabs-wrapper) button:active {
   background: transparent;
   transform: none;
   box-shadow: none;
 }
-:where(.goey-search-wrapper) button:focus,
-:where(.goey-search-wrapper) button:focus-visible {
+:where(.gooey-search-tabs-wrapper) button:focus,
+:where(.gooey-search-tabs-wrapper) button:focus-visible {
   outline: none;
   box-shadow: none;
 }
@@ -1175,6 +1175,141 @@ code {
 }
 
 /* ============================================
+   Changelog Page
+   ============================================ */
+.page-changelog {
+  padding: 2rem 0 6rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 6px 12px 6px 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  font-family: var(--font-body);
+  margin-bottom: 2rem;
+  margin-left: -8px;
+}
+
+.back-link:hover {
+  color: var(--text);
+  background: var(--card);
+  transform: none;
+  box-shadow: none;
+}
+
+.back-link:active {
+  background: var(--card-hover);
+  transform: none;
+  box-shadow: none;
+}
+
+.page-changelog .changelog-header {
+  margin-bottom: 2.5rem;
+}
+
+.page-changelog .changelog-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.page-changelog .changelog-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.changelog-entry {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 2rem;
+  padding: 1.5rem 0;
+  min-width: 0;
+}
+
+.changelog-entry + .changelog-entry {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.changelog-version {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.changelog-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--green);
+  background: var(--green-soft);
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.changelog-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.changelog-body h4 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.changelog-body ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.changelog-body li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+
+.changelog-body li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.nav-link--active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.mobile-menu-link--active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ============================================
    Footer
    ============================================ */
 .site-footer {
@@ -1303,6 +1438,23 @@ code {
   .doc-section {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .changelog-entry {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .page-changelog {
+    padding: 1.5rem 0 4rem;
+  }
+
+  .page-changelog .changelog-header h1 {
+    font-size: 2rem;
+  }
+
+  .page-changelog .changelog-header {
+    margin-bottom: 1.5rem;
   }
 
   .doc-section-label {

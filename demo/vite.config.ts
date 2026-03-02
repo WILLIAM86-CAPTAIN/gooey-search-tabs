@@ -4,7 +4,7 @@ import path from 'path'
 import fs from 'fs'
 
 const localSrc = path.resolve(__dirname, '../src/index.ts')
-const localCss = path.resolve(__dirname, '../src/components/GoeySearch.css')
+const localCss = path.resolve(__dirname, '../src/components/GooeySearchTabs.css')
 const useLocalSource = fs.existsSync(localSrc)
 
 export default defineConfig({
@@ -13,8 +13,8 @@ export default defineConfig({
     alias: {
       ...(useLocalSource
         ? {
-            'goey-search/styles.css': localCss,
-            'goey-search': localSrc,
+            'gooey-search-tabs/styles.css': localCss,
+            'gooey-search-tabs': localSrc,
           }
         : {}),
       react: path.resolve(__dirname, 'node_modules/react'),

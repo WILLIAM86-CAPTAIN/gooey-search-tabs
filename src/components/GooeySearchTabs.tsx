@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useId } from 'react'
 import { motion, AnimatePresence, LayoutGroup, animate } from 'framer-motion'
-import type { GoeySearchProps } from '../types'
+import type { GooeySearchTabsProps } from '../types'
 import { animationPresets } from '../presets'
 import { SearchIcon } from './SearchIcon'
 import { CloseIcon } from './CloseIcon'
@@ -11,7 +11,7 @@ const DEFAULT_INPUT_WIDTH = 220
 const GAP = 8
 const FADE_DUR = 0.1 // opacity fade duration for morph sequencing
 
-export const GoeySearch = ({
+export const GooeySearchTabs = ({
   tabs = [],
   activeTab: controlledActiveTab,
   defaultActiveTab,
@@ -26,11 +26,14 @@ export const GoeySearch = ({
   spring: springProp,
   bounce: bounceProp,
   preset,
+  gooey = false,
+  gooeyIntensity = 0.5,
   className,
   style,
   classNames = {},
-}: GoeySearchProps) => {
+}: GooeySearchTabsProps) => {
   const instanceId = useId()
+  const filterId = `gooey-goo-${instanceId.replace(/:/g, '')}`
   const resolved = preset ? animationPresets[preset] : undefined
   const useSpring = springProp ?? resolved?.spring ?? true
   const bounce = bounceProp ?? resolved?.bounce ?? 0.1
@@ -46,6 +49,8 @@ export const GoeySearch = ({
   const barRef = useRef<HTMLDivElement>(null)
   const rightSlotRef = useRef<HTMLDivElement>(null)
   const wasExpandedRef = useRef(defaultExpanded)
+  const bridgeRef = useRef<HTMLDivElement>(null)
+  const bridgeWasExpandedRef = useRef(defaultExpanded)
 
   const searchValue = controlledValue ?? internalValue
   const currentActiveTab = controlledActiveTab ?? internalActiveTab
@@ -54,6 +59,16 @@ export const GoeySearch = ({
   const transition = useSpring
     ? { type: 'spring' as const, bounce, duration: 0.5 }
     : { type: 'tween' as const, duration: 0.3, ease: 'easeInOut' as const }
+
+  // Bridge height: linear scale gives more visible hourglass curves at medium intensity
+  const bridgeHeight = Math.max(4, Math.round(gooeyIntensity * 44))
+
+  // Bridge overlap: at high intensity, the bridge extends behind the pills via
+  // negative margins. This fills the gap left by the pills' border-radius at the
+  // top/bottom corners, eliminating concave notches at the junction.
+  // Flex contribution stays constant: (GAP + 2*overlap) - 2*overlap = GAP.
+  const bridgeOverlap = Math.round(gooeyIntensity * 15)
+  const bridgeWidth = GAP + bridgeOverlap * 2
 
   // Reset locked width when tabs change so it re-measures
   const tabsKey = tabs.map(t => `${t.label}|${t.value}`).join(',')
@@ -67,7 +82,7 @@ export const GoeySearch = ({
       requestAnimationFrame(() => {
         if (wrapperRef.current) {
           // Measure tabs content directly so grid min-width:0 doesn't affect the result
-          const tabsEl = wrapperRef.current.querySelector('.goey-search-tabs-content') as HTMLElement
+          const tabsEl = wrapperRef.current.querySelector('.gooey-search-tabs-tabs-content') as HTMLElement
           if (tabsEl) {
             setLockedWidth(BAR_COLLAPSED + GAP + tabsEl.scrollWidth)
           }
@@ -209,6 +224,34 @@ export const GoeySearch = ({
     }
   }, [expanded, hasTabs, lockedWidth, bounce])
 
+  // Bridge squeeze animation — when expanding/collapsing, the bridge
+  // squeezes thin then springs back, creating a stretchy effect.
+  useEffect(() => {
+    const wasExp = bridgeWasExpandedRef.current
+    bridgeWasExpandedRef.current = expanded
+
+    const bridge = bridgeRef.current
+    if (!bridge || !gooey || expanded === wasExp) return
+
+    // Quick squeeze to 30% height
+    bridge.style.transition = 'height 0.06s ease-in'
+    bridge.style.height = Math.max(2, Math.round(bridgeHeight * 0.3)) + 'px'
+
+    const timer = setTimeout(() => {
+      // Spring back to full height with overshoot
+      bridge.style.transition = 'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+      bridge.style.height = bridgeHeight + 'px'
+    }, 60)
+
+    return () => {
+      clearTimeout(timer)
+      if (bridge) {
+        bridge.style.transition = ''
+        bridge.style.height = bridgeHeight + 'px'
+      }
+    }
+  }, [expanded, gooey, bridgeHeight])
+
   // Input transition delayed by FADE_DUR so tabs/close fades first
   const inputTransition = {
     ...transition,
@@ -223,23 +266,44 @@ export const GoeySearch = ({
 
   return (
     <LayoutGroup id={instanceId}>
+      {gooey && (
+        <svg style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
+          <defs>
+            <filter id={filterId} x="-10%" y="-60%" width="120%" height="220%">
+              {/* Blur smooths the junction where bridge meets pill */}
+              {/* Blur scales with intensity: thicker bridge → curvier junctions.
+                  Bridge overlap fills corners so higher blur doesn't create notches. */}
+              <feGaussianBlur in="SourceGraphic" stdDeviation={`${2 + gooeyIntensity * 8} ${2 + gooeyIntensity * 16}`} result="blur" />
+              {/* Force pure white + binary threshold → crisp organic outline */}
+              <feColorMatrix in="blur" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 100 -50" result="goo" />
+              {/* Organic goo behind, original content on top */}
+              <feMerge>
+                <feMergeNode in="goo" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+        </svg>
+      )}
       <div
         ref={wrapperRef}
-        className={`goey-search-wrapper ${className ?? ''} ${classNames.container ?? ''}`.trim()}
+        className={`gooey-search-tabs-wrapper ${className ?? ''} ${classNames.container ?? ''}`.trim()}
         style={{
           ...style,
           ...(hasTabs && lockedWidth ? { width: lockedWidth } : undefined),
+          ...(gooey ? { gap: 0, filter: `url(#${filterId}) drop-shadow(0 2px 4px rgba(0,0,0,0.08)) drop-shadow(0 1px 2px rgba(0,0,0,0.04))` } : undefined),
         }}
         role="search"
         aria-label="Search"
         data-expanded={expanded}
+        data-gooey={gooey || undefined}
       >
         {/* Left side: bar grows as input springs in, pushing right-slot.
             The input spring creates the bounce — bar overshoots on expand,
             and on collapse the bounce-back compresses the right-slot from the left. */}
-        <div ref={barRef} className="goey-search-bar">
+        <div ref={barRef} className="gooey-search-tabs-bar">
           <button
-            className={`goey-search-trigger ${classNames.searchButton ?? ''}`.trim()}
+            className={`gooey-search-tabs-trigger ${classNames.searchButton ?? ''}`.trim()}
             onClick={expanded ? undefined : handleExpand}
             aria-label={expanded ? 'Search' : 'Open search'}
             type="button"
@@ -252,7 +316,7 @@ export const GoeySearch = ({
             {expanded && (
               <motion.div
                 key="input-area"
-                className="goey-search-input-wrapper"
+                className="gooey-search-tabs-input-wrapper"
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ width: inputExpandedWidth, opacity: 1, transition: inputTransition }}
                 exit={{ width: 0, opacity: 0, transition: inputExitTransition }}
@@ -260,7 +324,7 @@ export const GoeySearch = ({
                 <input
                   ref={inputRef}
                   type="text"
-                  className={`goey-search-input ${classNames.input ?? ''}`.trim()}
+                  className={`gooey-search-tabs-input ${classNames.input ?? ''}`.trim()}
                   placeholder={placeholder}
                   value={searchValue}
                   onChange={handleInputChange}
@@ -272,14 +336,28 @@ export const GoeySearch = ({
           </AnimatePresence>
         </div>
 
+        {/* Goey bridge — solid white connector between bar and right-slot */}
+        {gooey && hasTabs && (
+          <div
+            ref={bridgeRef}
+            className="gooey-search-tabs-bridge"
+            style={{
+              width: bridgeWidth,
+              height: bridgeHeight,
+              marginLeft: -bridgeOverlap,
+              marginRight: -bridgeOverlap,
+            }}
+          />
+        )}
+
         {/* Right side: pill that morphs from tabs to close.
             Width is flex-driven (passively follows the bar's spring).
             Tabs and close are always rendered, opacity sequenced. */}
         {hasTabs && (
-          <div ref={rightSlotRef} className="goey-search-right-slot">
+          <div ref={rightSlotRef} className="gooey-search-tabs-right-slot">
             {/* Tabs — fade out immediately on expand, fade in early during collapse bounce */}
             <motion.div
-              className={`goey-search-tabs-content ${classNames.tabList ?? ''}`.trim()}
+              className={`gooey-search-tabs-tabs-content ${classNames.tabList ?? ''}`.trim()}
               role="tablist"
               initial={false}
               animate={{ opacity: expanded ? 0 : 1 }}
@@ -297,7 +375,7 @@ export const GoeySearch = ({
                     role="tab"
                     aria-selected={isActive}
                     className={[
-                      'goey-search-tab',
+                      'gooey-search-tabs-tab',
                       classNames.tab ?? '',
                       isActive ? (classNames.activeTab ?? '') : '',
                     ]
@@ -308,14 +386,14 @@ export const GoeySearch = ({
                   >
                     {isActive && (
                       <motion.span
-                        layoutId="goey-search-active-indicator"
-                        className="goey-search-tab-indicator"
+                        layoutId="gooey-search-tabs-active-indicator"
+                        className="gooey-search-tabs-tab-indicator"
                         transition={transition}
                       />
                     )}
-                    <span className="goey-search-tab-content">
+                    <span className="gooey-search-tabs-tab-content">
                       {tab.icon && (
-                        <span className="goey-search-tab-icon">{tab.icon}</span>
+                        <span className="gooey-search-tabs-tab-icon">{tab.icon}</span>
                       )}
                       {tab.label}
                     </span>
@@ -326,7 +404,7 @@ export const GoeySearch = ({
 
             {/* Close — fade in early during expand bounce, fade out immediately on collapse */}
             <motion.button
-              className={`goey-search-close-content ${classNames.closeButton ?? ''}`.trim()}
+              className={`gooey-search-tabs-close-content ${classNames.closeButton ?? ''}`.trim()}
               initial={false}
               animate={{ opacity: expanded ? 1 : 0 }}
               transition={{
@@ -349,14 +427,14 @@ export const GoeySearch = ({
             {expanded && (
               <motion.div
                 key="close-slot"
-                className="goey-search-right-slot"
+                className="gooey-search-tabs-right-slot"
                 style={{ width: CLOSE_SIZE }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.15 } }}
                 exit={{ opacity: 0, transition: { duration: 0.1 } }}
               >
                 <button
-                  className={`goey-search-close-content ${classNames.closeButton ?? ''}`.trim()}
+                  className={`gooey-search-tabs-close-content ${classNames.closeButton ?? ''}`.trim()}
                   onClick={handleCollapse}
                   aria-label="Close search"
                   type="button"

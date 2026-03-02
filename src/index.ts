@@ -1,9 +1,9 @@
-import './components/GoeySearch.css'
-export { GoeySearch } from './components/GoeySearch'
+import './components/GooeySearchTabs.css'
+export { GooeySearchTabs } from './components/GooeySearchTabs'
 export { animationPresets } from './presets'
 export type { AnimationPreset, AnimationPresetName } from './presets'
 export type {
-  GoeySearchProps,
-  GoeySearchTab,
-  GoeySearchClassNames,
+  GooeySearchTabsProps,
+  GooeySearchTab,
+  GooeySearchTabsClassNames,
 } from './types'

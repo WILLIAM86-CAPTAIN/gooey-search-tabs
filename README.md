@@ -1,4 +1,4 @@
-# goey-search
+# gooey-search-tabs
 
 A morphing search bar component with animated tab navigation for React. Built with Framer Motion.
 
@@ -10,6 +10,7 @@ A morphing search bar component with animated tab navigation for React. Built wi
 - Four animation presets: smooth, bouncy, subtle, snappy
 - Keyboard shortcuts: Enter to search, Escape to collapse
 - Controlled and uncontrolled modes for value and active tab
+- Gooey blob effect connecting tabs and search bar with adjustable intensity
 - No-tabs variant for a simple expanding search bar
 - CSS class overrides via `classNames` prop
 - Full accessibility: `role="search"`, `role="tablist"`, `aria-selected`, focus-visible outlines
@@ -17,12 +18,12 @@ A morphing search bar component with animated tab navigation for React. Built wi
 ## Installation
 
 ```bash
-npm install goey-search
+npm install gooey-search-tabs
 ```
 
 ### Peer Dependencies
 
-goey-search requires the following peer dependencies:
+gooey-search-tabs requires the following peer dependencies:
 
 ```bash
 npm install react react-dom framer-motion
@@ -36,10 +37,10 @@ npm install react react-dom framer-motion
 
 ### CSS Import (Required)
 
-You **must** import the goey-search stylesheet for the component to render correctly:
+You **must** import the gooey-search-tabs stylesheet for the component to render correctly:
 
 ```tsx
-import 'goey-search/styles.css'
+import 'gooey-search-tabs/styles.css'
 ```
 
 Add this import once in your app's entry point (e.g., `main.tsx` or `App.tsx`). Without it, the search bar will appear unstyled.
@@ -47,12 +48,12 @@ Add this import once in your app's entry point (e.g., `main.tsx` or `App.tsx`). 
 ## Quick Start
 
 ```tsx
-import { GoeySearch } from 'goey-search'
-import 'goey-search/styles.css'
+import { GooeySearchTabs } from 'gooey-search-tabs'
+import 'gooey-search-tabs/styles.css'
 
 function App() {
   return (
-    <GoeySearch
+    <GooeySearchTabs
       tabs={[
         { label: 'All', value: 'all' },
         { label: 'Images', value: 'images' },
@@ -66,13 +67,13 @@ function App() {
 
 ## API Reference
 
-### `GoeySearchProps`
+### `GooeySearchTabsProps`
 
-Props for the `<GoeySearch />` component.
+Props for the `<GooeySearchTabs />` component.
 
 | Prop              | Type                          | Default | Description                              |
 | ----------------- | ----------------------------- | ------- | ---------------------------------------- |
-| `tabs`            | `GoeySearchTab[]`             | —       | Tab items shown in collapsed state       |
+| `tabs`            | `GooeySearchTab[]`            | —       | Tab items shown in collapsed state       |
 | `activeTab`       | `string`                      | —       | Controlled active tab value              |
 | `defaultActiveTab`| `string`                      | —       | Default active tab (uncontrolled)        |
 | `onTabChange`     | `(value: string) => void`     | —       | Called when a tab is clicked             |
@@ -86,11 +87,13 @@ Props for the `<GoeySearch />` component.
 | `spring`          | `boolean`                     | `true`  | Use spring-based animation               |
 | `bounce`          | `number`                      | —       | Spring bounce factor (0–1)               |
 | `preset`          | `AnimationPresetName`         | —       | Named animation preset                   |
+| `gooey`           | `boolean`                     | `false` | Enable gooey blob effect connecting bar and tabs |
+| `gooeyIntensity`  | `number`                      | `0.5`   | Gooey connector thickness (0–1)          |
 | `className`       | `string`                      | —       | CSS class on the outer container         |
 | `style`           | `CSSProperties`               | —       | Inline styles on the outer container     |
-| `classNames`      | `GoeySearchClassNames`        | —       | Custom class names for sub-elements      |
+| `classNames`      | `GooeySearchTabsClassNames`   | —       | Custom class names for sub-elements      |
 
-### `GoeySearchTab`
+### `GooeySearchTab`
 
 | Property | Type        | Required | Description                                  |
 | -------- | ----------- | -------- | -------------------------------------------- |
@@ -98,7 +101,7 @@ Props for the `<GoeySearch />` component.
 | `icon`   | `ReactNode` | No       | Optional icon rendered before the label      |
 | `value`  | `string`    | Yes      | Unique value used for identification and callbacks |
 
-### `GoeySearchClassNames`
+### `GooeySearchTabsClassNames`
 
 Override styles for any part of the search bar.
 
@@ -124,7 +127,7 @@ Four built-in presets control spring physics:
 | `snappy` | 0.4    | Quick response with moderate bounce  |
 
 ```tsx
-<GoeySearch preset="bouncy" />
+<GooeySearchTabs preset="bouncy" />
 ```
 
 ## Usage Examples
@@ -132,7 +135,7 @@ Four built-in presets control spring physics:
 ### With Tabs
 
 ```tsx
-<GoeySearch
+<GooeySearchTabs
   tabs={[
     { label: 'Popular', value: 'popular', icon: '🔥' },
     { label: 'Favorites', value: 'favorites', icon: '❤️' },
@@ -147,7 +150,7 @@ Four built-in presets control spring physics:
 ### Without Tabs
 
 ```tsx
-<GoeySearch
+<GooeySearchTabs
   placeholder="Search anything..."
   onSearch={(value) => console.log(value)}
 />
@@ -159,7 +162,7 @@ Four built-in presets control spring physics:
 const [query, setQuery] = useState('')
 const [tab, setTab] = useState('all')
 
-<GoeySearch
+<GooeySearchTabs
   tabs={tabs}
   value={query}
   onChange={setQuery}
@@ -173,19 +176,31 @@ const [tab, setTab] = useState('all')
 
 ```tsx
 // Named preset
-<GoeySearch preset="bouncy" />
+<GooeySearchTabs preset="bouncy" />
 
 // Or manual spring control
-<GoeySearch spring={true} bounce={0.6} />
+<GooeySearchTabs spring={true} bounce={0.6} />
 
 // Disable spring (smooth easing)
-<GoeySearch spring={false} />
+<GooeySearchTabs spring={false} />
+```
+
+### Gooey Effect
+
+```tsx
+// Enable the gooey blob connector between tabs and search bar
+<GooeySearchTabs
+  tabs={tabs}
+  gooey
+  gooeyIntensity={0.4}
+  placeholder="Search..."
+/>
 ```
 
 ### Custom Styling
 
 ```tsx
-<GoeySearch
+<GooeySearchTabs
   className="my-search"
   classNames={{
     container: 'my-container',
@@ -199,7 +214,7 @@ const [tab, setTab] = useState('all')
 ### Start Expanded
 
 ```tsx
-<GoeySearch
+<GooeySearchTabs
   defaultExpanded
   placeholder="Type to search..."
   onExpandedChange={(expanded) => console.log(expanded)}
@@ -217,24 +232,24 @@ const [tab, setTab] = useState('all')
 
 ```ts
 // Component
-export { GoeySearch } from 'goey-search'
+export { GooeySearchTabs } from 'gooey-search-tabs'
 
 // Animation presets
-export { animationPresets } from 'goey-search'
+export { animationPresets } from 'gooey-search-tabs'
 
 // Types
 export type {
-  GoeySearchProps,
-  GoeySearchTab,
-  GoeySearchClassNames,
+  GooeySearchTabsProps,
+  GooeySearchTab,
+  GooeySearchTabsClassNames,
   AnimationPreset,
   AnimationPresetName,
-} from 'goey-search'
+} from 'gooey-search-tabs'
 ```
 
 ## Browser Support
 
-goey-search works in all modern browsers that support:
+gooey-search-tabs works in all modern browsers that support:
 
 - CSS Grid and Flexbox
 - ResizeObserver

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { GoeySearch, animationPresets } from 'goey-search'
-import type { AnimationPresetName } from 'goey-search'
+import { GooeySearchTabs, animationPresets } from 'gooey-search-tabs'
+import type { AnimationPresetName } from 'gooey-search-tabs'
 import { Analytics } from '@vercel/analytics/react'
-import 'goey-search/styles.css'
+import 'gooey-search-tabs/styles.css'
 import './App.css'
 
 function GithubIcon({ size = 16 }: { size?: number }) {
@@ -57,6 +57,17 @@ function CloseIcon() {
   )
 }
 
+function ArrowLeftIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </svg>
+  )
+}
+
+type Page = 'home' | 'changelog'
+
 function useCopy() {
   const [copied, setCopied] = useState(false)
   const copy = (text: string) => {
@@ -72,6 +83,7 @@ const PRESET_NAMES: AnimationPresetName[] = ['smooth', 'bouncy', 'subtle', 'snap
 
 function App() {
   const installCopy = useCopy()
+  const [page, setPage] = useState<Page>('home')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [heroVisible, setHeroVisible] = useState(true)
   const [heroLanding, setHeroLanding] = useState(false)
@@ -83,10 +95,12 @@ function App() {
     { label: '\u{1F525} Popular', value: 'popular' },
     { label: '\u2764\uFE0F Favorites', value: 'favorites' },
   ])
-  const [pgPreset, setPgPreset] = useState<AnimationPresetName | null>('smooth')
+  const [pgPreset, setPgPreset] = useState<AnimationPresetName | null>('snappy')
   const [pgSpring, setPgSpring] = useState(true)
-  const [pgBounce, setPgBounce] = useState(0.1)
+  const [pgBounce, setPgBounce] = useState(0.4)
   const [pgPlaceholder, setPgPlaceholder] = useState('Search...')
+  const [pgGooey, setPgGooey] = useState(false)
+  const [pgGooeyIntensity, setPgGooeyIntensity] = useState(0.5)
   const codeCopy = useCopy()
 
   // Watch hero title visibility for header transform
@@ -110,6 +124,11 @@ function App() {
     prevHeroVisible.current = heroVisible
   }, [heroVisible])
 
+  // Scroll to top on page change
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [page])
+
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false)
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -123,29 +142,31 @@ function App() {
   const springCode = !pgPreset && !pgSpring ? `\n      spring={false}` : ''
   const bounceCode = !pgPreset && pgSpring && pgBounce !== 0.1 ? `\n      bounce={${pgBounce}}` : ''
   const placeholderCode = pgPlaceholder ? `\n      placeholder="${pgPlaceholder}"` : ''
-  const generatedCode = `<GoeySearch${tabsCode}${presetCode}${springCode}${bounceCode}${placeholderCode}\n    />`
+  const gooeyCode = pgGooey ? `\n      gooey${pgGooeyIntensity !== 0.5 ? `\n      gooeyIntensity={${pgGooeyIntensity}}` : ''}` : ''
+  const generatedCode = `<GooeySearchTabs${tabsCode}${presetCode}${springCode}${bounceCode}${placeholderCode}${gooeyCode}\n    />`
 
   return (
     <>
       <Analytics />
 
       {/* Header */}
-      <header className={`site-header${!heroVisible ? ' header--hero-hidden' : ''}`}>
+      <header className={`site-header${!heroVisible && page === 'home' ? ' header--hero-hidden' : ''}`}>
         <div className="header-inner">
-          <button className="header-logo" onClick={() => window.scrollTo(0, 0)}>
-            goey-search <img src="/mascot.png" className="header-mascot" alt="" />
+          <button className="header-logo" onClick={() => { setPage('home'); window.scrollTo(0, 0) }}>
+            gooey-search-tabs <img src="/mascot.png" className="header-mascot" alt="" />
           </button>
 
           <nav className="header-nav">
-            <button className="nav-link" onClick={() => scrollTo('playground')}>Playground</button>
-            <button className="nav-link" onClick={() => scrollTo('docs')}>Docs</button>
+            <button className="nav-link" onClick={() => { setPage('home'); setTimeout(() => scrollTo('playground'), 50) }}>Playground</button>
+            <button className="nav-link" onClick={() => { setPage('home'); setTimeout(() => scrollTo('docs'), 50) }}>Docs</button>
+            <button className={`nav-link${page === 'changelog' ? ' nav-link--active' : ''}`} onClick={() => setPage('changelog')}>Changelog</button>
           </nav>
 
           <div className="header-icons">
-            <a href="https://github.com/anl331/goey-search" target="_blank" rel="noopener noreferrer" className="header-icon-link" aria-label="GitHub">
+            <a href="https://github.com/anl331/gooey-search-tabs" target="_blank" rel="noopener noreferrer" className="header-icon-link" aria-label="GitHub">
               <GithubIcon size={18} />
             </a>
-            <a href="https://www.npmjs.com/package/goey-search" target="_blank" rel="noopener noreferrer" className="header-icon-link" aria-label="npm">
+            <a href="https://www.npmjs.com/package/gooey-search-tabs" target="_blank" rel="noopener noreferrer" className="header-icon-link" aria-label="npm">
               <NpmIcon size={18} />
             </a>
           </div>
@@ -157,14 +178,15 @@ function App() {
 
         {mobileMenuOpen && (
           <div className="mobile-menu">
-            <button className="mobile-menu-link" onClick={() => scrollTo('playground')}>Playground</button>
-            <button className="mobile-menu-link" onClick={() => scrollTo('docs')}>Docs</button>
+            <button className="mobile-menu-link" onClick={() => { setPage('home'); setMobileMenuOpen(false); setTimeout(() => scrollTo('playground'), 50) }}>Playground</button>
+            <button className="mobile-menu-link" onClick={() => { setPage('home'); setMobileMenuOpen(false); setTimeout(() => scrollTo('docs'), 50) }}>Docs</button>
+            <button className={`mobile-menu-link${page === 'changelog' ? ' mobile-menu-link--active' : ''}`} onClick={() => { setPage('changelog'); setMobileMenuOpen(false) }}>Changelog</button>
             <div className="mobile-menu-divider" />
             <div className="mobile-menu-icons">
-              <a href="https://github.com/anl331/goey-search" target="_blank" rel="noopener noreferrer" className="header-icon-link">
+              <a href="https://github.com/anl331/gooey-search-tabs" target="_blank" rel="noopener noreferrer" className="header-icon-link">
                 <GithubIcon size={18} /> GitHub
               </a>
-              <a href="https://www.npmjs.com/package/goey-search" target="_blank" rel="noopener noreferrer" className="header-icon-link">
+              <a href="https://www.npmjs.com/package/gooey-search-tabs" target="_blank" rel="noopener noreferrer" className="header-icon-link">
                 <NpmIcon size={18} /> npm
               </a>
             </div>
@@ -172,20 +194,57 @@ function App() {
         )}
       </header>
 
+      {page === 'changelog' ? (
+        <div className="page-changelog">
+          <button className="back-link" onClick={() => setPage('home')}>
+            <ArrowLeftIcon /> Back to home
+          </button>
+
+          <div className="changelog-header">
+            <h1>Changelog</h1>
+            <p>What's new in gooey-search-tabs.</p>
+          </div>
+
+          <div className="changelog-entry">
+            <div className="changelog-version">
+              <span className="changelog-tag">v0.1.0</span>
+              <span className="changelog-date">Mar 1, 2026</span>
+            </div>
+            <div className="changelog-body">
+              <h4>Initial Release</h4>
+              <ul>
+                <li>Morphing search bar animation (tabs pill to input + close button)</li>
+                <li>Animated tab navigation with sliding active indicator</li>
+                <li>Spring physics with configurable bounce intensity</li>
+                <li>Four animation presets: <code>smooth</code>, <code>bouncy</code>, <code>subtle</code>, <code>snappy</code></li>
+                <li>Gooey blob effect connecting tabs and search bar with adjustable intensity</li>
+                <li>Keyboard shortcuts: Enter to search, Escape to collapse</li>
+                <li>Controlled and uncontrolled modes for value and active tab</li>
+                <li>No-tabs variant for a simple expanding search bar</li>
+                <li>CSS class overrides via <code>classNames</code> prop</li>
+                <li>Full accessibility: <code>role="search"</code>, <code>role="tablist"</code>, <code>aria-selected</code>, focus-visible outlines</li>
+                <li>Interactive playground with live preview and code generation</li>
+                <li>Built with Framer Motion</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      ) : (
+      <>
       {/* Hero */}
       <div className="hero">
         <div className="hero-badge">
           <span /> v0.1.0
         </div>
-        <h1 ref={heroTitleRef} className={heroLanding ? 'hero-title--landing' : ''}>goey-search <img src="/mascot.png" className={`hero-mascot${heroLanding ? ' hero-mascot--landing' : ''}`} alt="" /></h1>
+        <h1 ref={heroTitleRef} className={heroLanding ? 'hero-title--landing' : ''}>gooey-search-tabs <img src="/mascot.png" className={`hero-mascot${heroLanding ? ' hero-mascot--landing' : ''}`} alt="" /></h1>
         <p className="hero-description">
           A morphing search bar with animated tab navigation for React.
           Spring physics, keyboard shortcuts, and full customization out of the box.
         </p>
         <div className="hero-install">
           <div className="install-wrapper">
-            <code><span className="prompt">$</span> npm install goey-search</code>
-            <button className="copy-btn" onClick={() => installCopy.copy('npm install goey-search')}>
+            <code><span className="prompt">$</span> npm install gooey-search-tabs</code>
+            <button className="copy-btn" onClick={() => installCopy.copy('npm install gooey-search-tabs')}>
               {installCopy.copied ? <CheckIcon /> : <CopyIcon />}
             </button>
           </div>
@@ -206,7 +265,7 @@ function App() {
         <div className="playground-card">
           {/* Live Preview */}
           <div className="playground-preview">
-            <GoeySearch
+            <GooeySearchTabs
               tabs={pgTabs.length > 0 ? pgTabs.map((t) => ({
                 label: t.label,
                 value: t.value,
@@ -214,6 +273,8 @@ function App() {
               placeholder={pgPlaceholder}
               spring={pgSpring}
               bounce={pgBounce}
+              gooey={pgGooey}
+              gooeyIntensity={pgGooeyIntensity}
             />
           </div>
 
@@ -254,28 +315,6 @@ function App() {
 
             {/* Right side controls */}
             <div className="playground-right-controls">
-              {/* Preset Selector */}
-              <div className="playground-row">
-                <span className="playground-label">Animation Preset</span>
-                <div className="preset-buttons">
-                  {PRESET_NAMES.map((p) => (
-                    <button
-                      key={p}
-                      className="preset-pill"
-                      data-active={pgPreset === p}
-                      onClick={() => {
-                        setPgPreset(p)
-                        const pr = animationPresets[p]
-                        setPgSpring(pr.spring)
-                        setPgBounce(pr.bounce)
-                      }}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Spring Toggle */}
               <div className="playground-row">
                 <div className="toggle-row">
@@ -290,24 +329,84 @@ function App() {
                 </div>
               </div>
 
-              {/* Bounce Slider */}
-              <div className="playground-row">
-                <div className="slider-item">
-                  <div className="slider-item-header">
-                    <span className="slider-item-label">Bounce</span>
-                    <span className="slider-item-value">{pgBounce.toFixed(2)}</span>
+              {/* Preset Selector + Bounce (visible when spring is on) */}
+              {pgSpring && (
+                <>
+                  <div className="playground-row">
+                    <span className="playground-label">Animation Preset</span>
+                    <div className="preset-buttons">
+                      {PRESET_NAMES.map((p) => (
+                        <button
+                          key={p}
+                          className="preset-pill"
+                          data-active={pgPreset === p}
+                          onClick={() => {
+                            setPgPreset(p)
+                            const pr = animationPresets[p]
+                            setPgSpring(pr.spring)
+                            setPgBounce(pr.bounce)
+                          }}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <input
-                    type="range"
-                    className="slider"
-                    min="0.05"
-                    max="0.8"
-                    step="0.05"
-                    value={pgBounce}
-                    onChange={(e) => { setPgBounce(Number(e.target.value)); setPgPreset(null) }}
-                  />
+
+                  <div className="playground-row">
+                    <div className="slider-item">
+                      <div className="slider-item-header">
+                        <span className="slider-item-label">Bounce</span>
+                        <span className="slider-item-value">{pgBounce.toFixed(2)}</span>
+                      </div>
+                      <input
+                        type="range"
+                        className="slider"
+                        min="0.05"
+                        max="0.8"
+                        step="0.05"
+                        value={pgBounce}
+                        onChange={(e) => { setPgBounce(Number(e.target.value)); setPgPreset(null) }}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Goey Toggle */}
+              <div className="playground-row">
+                <div className="toggle-row">
+                  <span className="toggle-row-label">Goey effect</span>
+                  <button
+                    className="toggle"
+                    data-on={pgGooey}
+                    onClick={() => setPgGooey(!pgGooey)}
+                  >
+                    <div className="toggle-knob" />
+                  </button>
                 </div>
               </div>
+
+              {/* Goey Intensity Slider */}
+              {pgGooey && (
+                <div className="playground-row">
+                  <div className="slider-item">
+                    <div className="slider-item-header">
+                      <span className="slider-item-label">Goey thickness</span>
+                      <span className="slider-item-value">{pgGooeyIntensity.toFixed(2)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      className="slider"
+                      min="0.15"
+                      max="0.65"
+                      step="0.05"
+                      value={pgGooeyIntensity}
+                      onChange={(e) => setPgGooeyIntensity(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Placeholder Input */}
               <div className="playground-row">
@@ -347,14 +446,14 @@ function App() {
           </div>
           <div className="doc-section-content">
             <p>
-              Import the <span className="inline-code">GoeySearch</span> component and the stylesheet.
+              Import the <span className="inline-code">GooeySearchTabs</span> component and the stylesheet.
             </p>
-            <pre><code>{`import { GoeySearch } from 'goey-search'
-import 'goey-search/styles.css'
+            <pre><code>{`import { GooeySearchTabs } from 'gooey-search-tabs'
+import 'gooey-search-tabs/styles.css'
 
 function App() {
   return (
-    <GoeySearch
+    <GooeySearchTabs
       tabs={[
         { label: 'All', value: 'all' },
         { label: 'Images', value: 'images' },
@@ -372,11 +471,11 @@ function App() {
           </div>
         </div>
 
-        {/* 02 GoeySearch Props */}
+        {/* 02 GooeySearchTabs Props */}
         <div className="doc-section">
           <div className="doc-section-label">
             <div className="doc-number">02</div>
-            <h3>GoeySearch Props</h3>
+            <h3>GooeySearchTabs Props</h3>
           </div>
           <div className="doc-section-content">
             <div className="table-scroll">
@@ -385,7 +484,7 @@ function App() {
                 <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
               </thead>
               <tbody>
-                <tr><td>tabs</td><td>GoeySearchTab[]</td><td>—</td><td>Tab items shown in collapsed state</td></tr>
+                <tr><td>tabs</td><td>GooeySearchTab[]</td><td>—</td><td>Tab items shown in collapsed state</td></tr>
                 <tr><td>activeTab</td><td>string</td><td>—</td><td>Controlled active tab value</td></tr>
                 <tr><td>defaultActiveTab</td><td>string</td><td>—</td><td>Default active tab (uncontrolled)</td></tr>
                 <tr><td>onTabChange</td><td>(value: string) =&gt; void</td><td>—</td><td>Called when a tab is clicked</td></tr>
@@ -399,27 +498,29 @@ function App() {
                 <tr><td>spring</td><td>boolean</td><td>true</td><td>Use spring-based animation</td></tr>
                 <tr><td>bounce</td><td>number</td><td>—</td><td>Spring bounce factor (0–1)</td></tr>
                 <tr><td>preset</td><td>AnimationPresetName</td><td>—</td><td>Named animation preset</td></tr>
+                <tr><td>gooey</td><td>boolean</td><td>false</td><td>Enable goey blob effect connecting bar and tabs</td></tr>
+                <tr><td>gooeyIntensity</td><td>number</td><td>0.5</td><td>Goey connector thickness (0–1)</td></tr>
                 <tr><td>className</td><td>string</td><td>—</td><td>Class on the outer container</td></tr>
                 <tr><td>style</td><td>CSSProperties</td><td>—</td><td>Inline styles on the outer container</td></tr>
-                <tr><td>classNames</td><td>GoeySearchClassNames</td><td>—</td><td>Custom class names for sub-elements</td></tr>
+                <tr><td>classNames</td><td>GooeySearchTabsClassNames</td><td>—</td><td>Custom class names for sub-elements</td></tr>
               </tbody>
             </table>
             </div>
           </div>
         </div>
 
-        {/* 03 GoeySearchTab */}
+        {/* 03 GooeySearchTab */}
         <div className="doc-section">
           <div className="doc-section-label">
             <div className="doc-number">03</div>
-            <h3>GoeySearchTab</h3>
+            <h3>GooeySearchTab</h3>
           </div>
           <div className="doc-section-content">
             <p>
               Each tab requires a <span className="inline-code">label</span> and{' '}
               <span className="inline-code">value</span>.
             </p>
-            <pre><code>{`interface GoeySearchTab {
+            <pre><code>{`interface GooeySearchTab {
   label: string
   value: string
 }`}</code></pre>
@@ -437,7 +538,7 @@ function App() {
           </div>
         </div>
 
-        {/* 04 GoeySearchClassNames */}
+        {/* 04 GooeySearchTabsClassNames */}
         <div className="doc-section">
           <div className="doc-section-label">
             <div className="doc-number">04</div>
@@ -448,7 +549,7 @@ function App() {
               Override styles for any part of the search bar with{' '}
               <span className="inline-code">classNames</span>.
             </p>
-            <pre><code>{`<GoeySearch
+            <pre><code>{`<GooeySearchTabs
   classNames={{
     container: 'my-container',
     searchButton: 'my-search-btn',
@@ -486,10 +587,10 @@ function App() {
               Four built-in presets control spring physics. Apply via the{' '}
               <span className="inline-code">preset</span> prop.
             </p>
-            <pre><code>{`<GoeySearch preset="bouncy" />
+            <pre><code>{`<GooeySearchTabs preset="bouncy" />
 
 // Or import and inspect the presets object
-import { animationPresets } from 'goey-search'`}</code></pre>
+import { animationPresets } from 'gooey-search-tabs'`}</code></pre>
             <div className="table-scroll">
             <table className="prop-table">
               <thead>
@@ -523,7 +624,7 @@ import { animationPresets } from 'goey-search'`}</code></pre>
               Pass an array of tabs to show category navigation. Omit tabs for a simple search bar.
             </p>
             <pre><code>{`// With tabs
-<GoeySearch
+<GooeySearchTabs
   tabs={[
     { label: '🔥 Popular', value: 'popular' },
     { label: '❤️ Favorites', value: 'favorites' },
@@ -533,7 +634,7 @@ import { animationPresets } from 'goey-search'`}</code></pre>
 />
 
 // Without tabs — simple search bar
-<GoeySearch placeholder="Search..." />`}</code></pre>
+<GooeySearchTabs placeholder="Search..." />`}</code></pre>
           </div>
         </div>
 
@@ -550,7 +651,7 @@ import { animationPresets } from 'goey-search'`}</code></pre>
             <pre><code>{`const [query, setQuery] = useState('')
 const [tab, setTab] = useState('all')
 
-<GoeySearch
+<GooeySearchTabs
   tabs={tabs}
   value={query}
   onChange={setQuery}
@@ -590,22 +691,25 @@ const [tab, setTab] = useState('all')
           </div>
           <div className="doc-section-content">
             <pre><code>{`// Component
-export { GoeySearch } from 'goey-search'
+export { GooeySearchTabs } from 'gooey-search-tabs'
 
 // Animation presets
-export { animationPresets } from 'goey-search'
+export { animationPresets } from 'gooey-search-tabs'
 
 // Types
 export type {
-  GoeySearchProps,
-  GoeySearchTab,
-  GoeySearchClassNames,
+  GooeySearchTabsProps,
+  GooeySearchTab,
+  GooeySearchTabsClassNames,
   AnimationPreset,
   AnimationPresetName,
-} from 'goey-search'`}</code></pre>
+} from 'gooey-search-tabs'`}</code></pre>
           </div>
         </div>
       </div>
+
+      </>
+      )}
 
       {/* Footer */}
       <footer className="site-footer">

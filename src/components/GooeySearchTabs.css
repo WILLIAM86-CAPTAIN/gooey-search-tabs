@@ -3,7 +3,7 @@
    Width is locked after first paint to prevent
    any layout shift during morph transitions.
    ============================================ */
-.goey-search-wrapper {
+.gooey-search-tabs-wrapper {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -16,7 +16,7 @@
    Collapsed: shrink-wraps the icon (looks like a circle).
    Expanded: grows as the input animates in.
    ============================================ */
-.goey-search-bar {
+.gooey-search-tabs-bar {
   display: inline-flex;
   align-items: center;
   height: 44px;
@@ -30,7 +30,7 @@
 /* ============================================
    Search trigger button (the magnifying glass)
    ============================================ */
-.goey-search-trigger {
+.gooey-search-tabs-trigger {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,11 +47,11 @@
   transition: background 0.15s ease;
 }
 
-.goey-search-trigger:hover {
+.gooey-search-tabs-trigger:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.goey-search-trigger:focus-visible {
+.gooey-search-tabs-trigger:focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
 }
@@ -62,7 +62,7 @@
    shrinking + overflow:hidden creates the
    "push into collapse" effect naturally.
    ============================================ */
-.goey-search-right-slot {
+.gooey-search-tabs-right-slot {
   display: grid;
   align-items: center;
   justify-items: end;
@@ -74,7 +74,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.goey-search-right-slot > * {
+.gooey-search-tabs-right-slot > * {
   grid-area: 1 / 1;
   min-width: 0;
 }
@@ -82,7 +82,7 @@
 /* ============================================
    Tabs content — inside the right-slot pill
    ============================================ */
-.goey-search-tabs-content {
+.gooey-search-tabs-tabs-content {
   display: flex;
   align-items: stretch;
   gap: 2px;
@@ -90,7 +90,7 @@
   padding: 4px;
 }
 
-.goey-search-tab {
+.gooey-search-tabs-tab {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -110,11 +110,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.goey-search-tab:hover {
+.gooey-search-tabs-tab:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.goey-search-tab:focus-visible {
+.gooey-search-tabs-tab:focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: -2px;
 }
@@ -123,7 +123,7 @@
    Tab active indicator — slides between tabs
    using Framer Motion layoutId
    ============================================ */
-.goey-search-tab-indicator {
+.gooey-search-tabs-tab-indicator {
   position: absolute;
   inset: 0;
   border-radius: 999px;
@@ -131,7 +131,7 @@
   z-index: 0;
 }
 
-.goey-search-tab-content {
+.gooey-search-tabs-tab-content {
   position: relative;
   z-index: 1;
   display: inline-flex;
@@ -139,11 +139,11 @@
   gap: 6px;
 }
 
-.goey-search-tab[aria-selected="true"] {
+.gooey-search-tabs-tab[aria-selected="true"] {
   color: #dc2626;
 }
 
-.goey-search-tab-icon {
+.gooey-search-tabs-tab-icon {
   display: flex;
   align-items: center;
   font-size: 14px;
@@ -154,7 +154,7 @@
    Close button — transparent, inside the
    right-slot pill. Hover shows subtle overlay.
    ============================================ */
-.goey-search-close-content {
+.gooey-search-tabs-close-content {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,12 +174,12 @@
   transition: background 0.15s ease;
 }
 
-.goey-search-close-content:hover {
+.gooey-search-tabs-close-content:hover {
   background: rgba(0, 0, 0, 0.04);
   background-clip: content-box;
 }
 
-.goey-search-close-content:focus-visible {
+.gooey-search-tabs-close-content:focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
 }
@@ -187,13 +187,13 @@
 /* ============================================
    Search input (inside the expanded bar)
    ============================================ */
-.goey-search-input-wrapper {
+.gooey-search-tabs-input-wrapper {
   display: flex;
   align-items: center;
   overflow: hidden;
 }
 
-.goey-search-input {
+.gooey-search-tabs-input {
   width: 100%;
   border: none;
   background: transparent;
@@ -204,6 +204,27 @@
   padding: 8px 0 8px 12px;
 }
 
-.goey-search-input::placeholder {
+.gooey-search-tabs-input::placeholder {
   color: #9ca3af;
+}
+
+/* ============================================
+   Goey mode — physical bridge connects the pills.
+   Per-pill box-shadows are replaced with a unified
+   drop-shadow on the wrapper so the bridge outline
+   is visible on any background.
+   ============================================ */
+.gooey-search-tabs-wrapper[data-gooey] .gooey-search-tabs-bar,
+.gooey-search-tabs-wrapper[data-gooey] .gooey-search-tabs-right-slot {
+  box-shadow: none;
+}
+
+/* ============================================
+   Bridge — solid white connector between pills.
+   Height controlled by gooeyIntensity prop.
+   ============================================ */
+.gooey-search-tabs-bridge {
+  background: #ffffff;
+  align-self: center;
+  flex-shrink: 0;
 }

@@ -1,7 +1,7 @@
 import type { ReactNode, CSSProperties } from 'react'
 import type { AnimationPresetName } from './presets'
 
-export interface GoeySearchTab {
+export interface GooeySearchTab {
   /** Display label for the tab */
   label: string
   /** Optional icon rendered before the label */
@@ -10,9 +10,9 @@ export interface GoeySearchTab {
   value: string
 }
 
-export interface GoeySearchProps {
+export interface GooeySearchTabsProps {
   /** Tab items shown in collapsed state */
-  tabs?: GoeySearchTab[]
+  tabs?: GooeySearchTab[]
   /** Currently active tab value (controlled) */
   activeTab?: string
   /** Default active tab value (uncontrolled) */
@@ -39,15 +39,19 @@ export interface GoeySearchProps {
   bounce?: number
   /** Named animation preset */
   preset?: AnimationPresetName
+  /** Enable gooey blob effect connecting the bar and tabs */
+  gooey?: boolean
+  /** Gooey connector thickness (0–1, default 0.5) */
+  gooeyIntensity?: number
   /** Additional CSS class on the outer container */
   className?: string
   /** Additional inline styles on the outer container */
   style?: CSSProperties
   /** Custom class names for sub-elements */
-  classNames?: GoeySearchClassNames
+  classNames?: GooeySearchTabsClassNames
 }
 
-export interface GoeySearchClassNames {
+export interface GooeySearchTabsClassNames {
   container?: string
   searchButton?: string
   tabList?: string

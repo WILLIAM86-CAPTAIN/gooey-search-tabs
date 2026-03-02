@@ -1,5 +1,5 @@
 {
-  "name": "goey-search",
+  "name": "gooey-search-tabs",
   "version": "0.1.0",
   "description": "A morphing search bar component with animated tab navigation built with Framer Motion",
   "type": "module",
@@ -59,11 +59,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anl331/goey-search"
+    "url": "https://github.com/anl331/gooey-search-tabs"
   },
-  "homepage": "https://goey-search.vercel.app",
+  "homepage": "https://gooey-search-tabs.vercel.app",
   "bugs": {
-    "url": "https://github.com/anl331/goey-search/issues"
+    "url": "https://github.com/anl331/gooey-search-tabs/issues"
   },
   "engines": {
     "node": ">=18.0.0"
